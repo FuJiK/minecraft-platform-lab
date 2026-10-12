@@ -1,0 +1,25 @@
+name: Validate
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Validate Docker Compose
+        env:
+          RCON_PASSWORD: ci-placeholder-password
+        run: docker compose config
+
+      - name: Validate shell syntax
+        run: |
+          bash -n scripts/healthcheck.sh
+          bash -n scripts/backup.sh
