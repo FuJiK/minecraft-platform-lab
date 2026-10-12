@@ -1,0 +1,14 @@
+# Local environment
+.env
+
+# Minecraft runtime data
+data/
+
+# Backups
+backups/
+
+# OS / editor
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
