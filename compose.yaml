@@ -1,0 +1,51 @@
+services:
+  minecraft:
+    image: itzg/minecraft-server:latest
+    container_name: minecraft-platform-lab
+    restart: unless-stopped
+
+    ports:
+      - "${MINECRAFT_PORT:-25565}:25565/tcp"
+
+    environment:
+      EULA: "TRUE"
+      TYPE: "VANILLA"
+      VERSION: "LATEST"
+      MEMORY: "${MINECRAFT_MEMORY:-2G}"
+      TZ: "${TZ:-Asia/Tokyo}"
+
+      ONLINE_MODE: "TRUE"
+      ENABLE_RCON: "TRUE"
+      RCON_PASSWORD: "${RCON_PASSWORD}"
+
+      SERVER_NAME: "${SERVER_NAME:-Minecraft Platform Lab}"
+      MOTD: "${MOTD:-Minecraft Platform Engineering Lab}"
+      DIFFICULTY: "${DIFFICULTY:-easy}"
+      MODE: "${GAME_MODE:-survival}"
+      MAX_PLAYERS: "${MAX_PLAYERS:-10}"
+      VIEW_DISTANCE: "${VIEW_DISTANCE:-10}"
+      SIMULATION_DISTANCE: "${SIMULATION_DISTANCE:-10}"
+      PVP: "${PVP:-true}"
+      ALLOW_NETHER: "true"
+      ENABLE_COMMAND_BLOCK: "false"
+      SPAWN_PROTECTION: "16"
+
+    volumes:
+      - ./data:/data
+
+    healthcheck:
+      test: ["CMD", "mc-health"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 60s
+
+    deploy:
+      resources:
+        limits:
+          memory: "${CONTAINER_MEMORY_LIMIT:-3G}"
+
+    security_opt:
+      - no-new-privileges:true
+
+    stop_grace_period: 1m
