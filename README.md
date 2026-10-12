@@ -138,13 +138,13 @@ Test-NetConnection 192.168.1.20 -Port 25565
 ## Health Check
 
 ```bash
-./scripts/healthcheck.sh
+bash scripts/healthcheck.sh
 ```
 
 ## Backup
 
 ```bash
-./scripts/backup.sh
+bash scripts/backup.sh
 ```
 
 バックアップは `./backups/` に保存されます。
