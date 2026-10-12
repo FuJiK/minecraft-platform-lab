@@ -1,0 +1,19 @@
+# Reference only.
+# The itzg/minecraft-server image generates the active file at data/server.properties
+# from Compose environment variables. Use this file to study the corresponding
+# vanilla Minecraft server.properties settings.
+
+server-port=25565
+online-mode=true
+enable-rcon=true
+rcon.port=25575
+motd=Minecraft Platform Engineering Lab
+difficulty=easy
+gamemode=survival
+max-players=10
+view-distance=10
+simulation-distance=10
+pvp=true
+allow-nether=true
+enable-command-block=false
+spawn-protection=16
