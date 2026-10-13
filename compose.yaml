@@ -1,20 +1,39 @@
 services:
   minecraft:
     image: itzg/minecraft-server:latest
+    pull_policy: daily
     container_name: minecraft-platform-lab
     restart: unless-stopped
 
     ports:
+      # Java Edition
       - "${MINECRAFT_PORT:-25565}:25565/tcp"
+      # Bedrock Edition -> Geyser (UDP)
+      - "${BEDROCK_PORT:-19132}:19132/udp"
 
     environment:
       EULA: "TRUE"
-      TYPE: "VANILLA"
+
+      # Paper is lighter than vanilla and can load Geyser/Floodgate plugins.
+      TYPE: "PAPER"
       VERSION: "LATEST"
+
+      # Official GeyserMC downloads. Floodgate lets Xbox Live authenticated
+      # Bedrock users join without owning a separate Java Edition account.
+      PLUGINS: |
+        https://download.geysermc.org/v2/projects/geyser/versions/latest/builds/latest/downloads/spigot
+        https://download.geysermc.org/v2/projects/floodgate/versions/latest/builds/latest/downloads/spigot
+
+      # Keep the old 8 GB MacBookPro11,1 usable as both server and client.
       MEMORY: "${MINECRAFT_MEMORY:-2G}"
       TZ: "${TZ:-Asia/Tokyo}"
 
+      # Java clients still authenticate normally. Floodgate handles Bedrock
+      # players inside the Geyser/Floodgate plugin path.
       ONLINE_MODE: "TRUE"
+
+      # RCON is enabled only inside the Docker network/container. TCP/25575 is
+      # intentionally NOT published on the host.
       ENABLE_RCON: "TRUE"
       RCON_PASSWORD: "${RCON_PASSWORD}"
 
@@ -22,9 +41,12 @@ services:
       MOTD: "${MOTD:-Minecraft Platform Engineering Lab}"
       DIFFICULTY: "${DIFFICULTY:-easy}"
       MODE: "${GAME_MODE:-survival}"
-      MAX_PLAYERS: "${MAX_PLAYERS:-10}"
-      VIEW_DISTANCE: "${VIEW_DISTANCE:-10}"
-      SIMULATION_DISTANCE: "${SIMULATION_DISTANCE:-10}"
+      MAX_PLAYERS: "${MAX_PLAYERS:-5}"
+
+      # Conservative defaults for the Haswell dual-core / 8 GB machine.
+      VIEW_DISTANCE: "${VIEW_DISTANCE:-6}"
+      SIMULATION_DISTANCE: "${SIMULATION_DISTANCE:-4}"
+
       PVP: "${PVP:-true}"
       ALLOW_NETHER: "true"
       ENABLE_COMMAND_BLOCK: "false"
@@ -38,12 +60,9 @@ services:
       interval: 30s
       timeout: 10s
       retries: 5
-      start_period: 60s
+      start_period: 90s
 
-    deploy:
-      resources:
-        limits:
-          memory: "${CONTAINER_MEMORY_LIMIT:-3G}"
+    mem_limit: "${CONTAINER_MEMORY_LIMIT:-3G}"
 
     security_opt:
       - no-new-privileges:true
