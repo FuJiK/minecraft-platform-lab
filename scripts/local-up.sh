@@ -78,6 +78,18 @@ for attempt in $(seq 1 60); do
   sleep 5
 done
 
+log "checking Geyser plugin startup"
+recent_logs="$(docker compose logs --no-color --tail=250 minecraft 2>&1 || true)"
+
+if grep -q "Error occurred while enabling Geyser-Spigot" <<<"$recent_logs"; then
+  printf '%s\n' "$recent_logs" >&2
+  fail "Geyser-Spigot failed to enable"
+fi
+
+if ! grep -Eq "\[Geyser-Spigot\].*(Started Geyser|Geyser started|Listening on|Server started|Done)" <<<"$recent_logs"; then
+  log "warning: Minecraft is healthy, but Geyser startup success was not positively confirmed in recent logs"
+fi
+
 lan_ip="$(hostname -I 2>/dev/null | awk '{print $1}' || true)"
 
 printf '\n'
