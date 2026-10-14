@@ -213,6 +213,97 @@ Prism Launcher
      -> ImmediatelyFast
 ```
 
+### Java Runtime
+
+Ubuntu 26.04 側では Java 25 を利用します。
+
+確認:
+
+```bash
+java --version
+```
+
+例:
+
+```text
+openjdk 25.0.4.1
+OpenJDK Runtime Environment
+OpenJDK 64-Bit Server VM
+```
+
+### Prism Launcher を Flatpak で導入
+
+まず Flatpak と Flathub を利用できる状態にします。
+
+Flathub の登録確認:
+
+```bash
+flatpak remotes
+```
+
+次のように `flathub` が表示されれば利用可能です。
+
+```text
+Name    Options
+flathub system
+```
+
+未登録の場合:
+
+```bash
+flatpak remote-add --if-not-exists flathub \
+  https://dl.flathub.org/repo/flathub.flatpakrepo
+```
+
+Prism Launcher をインストール:
+
+```bash
+flatpak install flathub org.prismlauncher.PrismLauncher
+```
+
+起動:
+
+```bash
+flatpak run org.prismlauncher.PrismLauncher
+```
+
+Flatpak から `XDG_DATA_DIRS` の警告が表示される場合があります。これはインストール失敗ではなく、デスクトップのアプリ一覧への反映に再ログインや再起動が必要になる場合がある、という警告です。
+
+### Demo Edition で先に環境確認する
+
+正規版を購入する前でも、まずデモ版を使ってクライアント環境の成立確認を進められます。
+
+この段階で確認するポイント:
+
+- Prism Launcher が Ubuntu 26.04 で起動する
+- Java 25 を利用できる
+- Minecraft 26.2 のクライアント環境を作成できる
+- Fabric を導入できる
+- Sodium / Lithium / FerriteCore / ImmediatelyFast などの軽量化MODを追加できる
+- 古い MacBookPro11,1 上でクライアントが実用的に起動できるか確認する
+
+推奨構成:
+
+```text
+Ubuntu 26.04
+  -> OpenJDK 25
+  -> Prism Launcher
+     -> Minecraft 26.2
+        -> Fabric
+           -> Sodium
+           -> Lithium
+           -> FerriteCore
+           -> ImmediatelyFast
+```
+
+サーバー側は既に Paper 26.2 + Geyser + Floodgate で起動できます。
+
+```text
+localhost:25565
+```
+
+へのマルチプレイ接続は、デモ版側の機能制限により確認できない場合があります。その場合は、クライアント起動・Java・Fabric・MOD・描画性能までをデモ版で確認し、サーバー接続は正規版導入後の最終確認に回します。
+
 詳細: [`docs/ubuntu-client.md`](docs/ubuntu-client.md)
 
 ## PS5 / Bedrock
@@ -226,15 +317,17 @@ Prism Launcher
 ## Learning Roadmap
 
 1. `local-up.sh` でローカル起動
-2. Ubuntu上のJava Editionから `localhost:25565` へ接続
-3. LAN 内のJava Editionから TCP/25565 へ接続
-4. world データの永続化を確認
-5. Geyser/FloodgateでBedrock接続を確認
-6. Backup / Restore を実装
-7. Health Check と障害切り分け
-8. Prometheus / Grafana などで Observability を追加
-9. GitHub Actions で構成検証
-10. Terraform / Ansible などで再構築可能にする
+2. Ubuntu上で Prism Launcher / Java 25 / Minecraft 26.2 のクライアント環境を構築
+3. Demo Edition で Fabric + 軽量化MODの起動確認
+4. Ubuntu上のJava Editionから `localhost:25565` へ接続
+5. LAN 内のJava Editionから TCP/25565 へ接続
+6. world データの永続化を確認
+7. Geyser/FloodgateでBedrock接続を確認
+8. Backup / Restore を実装
+9. Health Check と障害切り分け
+10. Prometheus / Grafana などで Observability を追加
+11. GitHub Actions で構成検証
+12. Terraform / Ansible などで再構築可能にする
 
 詳細は [`docs/learning-roadmap.md`](docs/learning-roadmap.md) を参照してください。
 
