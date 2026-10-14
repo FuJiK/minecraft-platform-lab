@@ -89,54 +89,79 @@ Ubuntuクライアント側のセットアップは [`docs/ubuntu-client.md`](do
 
 Bedrock/Geyser側は [`docs/bedrock-crossplay.md`](docs/bedrock-crossplay.md) を参照してください。
 
-## Quick Start
+## Local Quick Start
 
-### 1. Clone
+Ubuntu上で最短起動する場合はこれだけです。
 
 ```bash
 git clone https://github.com/FuJiK/minecraft-platform-lab.git
 cd minecraft-platform-lab
+bash scripts/local-up.sh
 ```
 
-### 2. 環境変数を作る
+`local-up.sh` は以下を自動実行します。
+
+- Docker / Docker Compose v2 の存在確認
+- Docker daemon の疎通確認
+- `.env` が無ければ `.env.example` から自動生成
+- RCON password をランダム生成
+- `data/` / `backups/` 作成
+- `docker compose config` 検証
+- Image pull
+- Server 起動
+- Health Check が `healthy` になるまで待機
+- localhost / LAN の接続先表示
+
+起動後の状態確認:
+
+```bash
+bash scripts/local-status.sh
+```
+
+ログ追跡:
+
+```bash
+docker compose logs -f minecraft
+```
+
+停止:
+
+```bash
+bash scripts/local-down.sh
+```
+
+`./data` は残るため、停止しても world は保持されます。
+
+## Manual Start
+
+手動で各ステップを確認したい場合:
 
 ```bash
 cp .env.example .env
-```
+nano .env
 
-`.env` の `RCON_PASSWORD` は必ず変更してください。
-
-### 3. Compose を検証する
-
-```bash
 docker compose config
-```
-
-### 4. Server を起動する
-
-```bash
 docker compose pull
 docker compose up -d
-```
-
-### 5. 状態とログを確認する
-
-```bash
 docker compose ps
 docker compose logs -f minecraft
 ```
 
-ログ上で Paper / Geyser / Floodgate が読み込まれていることを確認します。
+## Connection
 
-### 6. Docker Host の LAN IP を確認する
+同じUbuntu機のJavaクライアント:
 
-Linux:
+```text
+localhost:25565
+```
+
+Docker Host のLAN IP確認:
 
 ```bash
 hostname -I
 ```
 
-例えば Docker Host が `192.168.1.20` の場合:
+例えば `192.168.1.20` の場合:
 
 Java Edition:
 
@@ -161,20 +186,6 @@ Port: 19132
 
 RCON 25575 はコンテナ内部でのみ利用し、ホストには公開しません。
 
-## TCP 疎通確認
-
-Java側:
-
-```bash
-nc -vz 127.0.0.1 25565
-```
-
-Bedrock側の待受確認:
-
-```bash
-ss -lunp | grep 19132
-```
-
 ## Health Check
 
 ```bash
@@ -189,14 +200,6 @@ bash scripts/backup.sh
 
 バックアップは `./backups/` に保存されます。
 
-## Stop
-
-```bash
-docker compose down
-```
-
-`./data` は Git 管理対象外で、`docker compose down` では削除されません。
-
 ## Ubuntu Client
 
 MacBookPro11,1 + Ubuntu 26.04 では、クライアント側は Java Edition + Fabric の軽量構成を推奨します。
@@ -210,31 +213,28 @@ Prism Launcher
      -> ImmediatelyFast
 ```
 
-詳細:
-
-[`docs/ubuntu-client.md`](docs/ubuntu-client.md)
+詳細: [`docs/ubuntu-client.md`](docs/ubuntu-client.md)
 
 ## PS5 / Bedrock
 
 サーバー側は Geyser + Floodgate で Bedrock を受けられる構成です。
 
-ただしPS5版は、任意の外部サーバーアドレスを直接追加する操作に制約があるため、まずスマホ・タブレット・Windows BedrockなどでLAN内の `UDP/19132` を検証してから、PS5側の接続経路を切り分けます。
+ただしPS5版は任意の外部サーバーアドレスを直接追加する操作に制約があるため、まずスマホ・タブレット・Windows BedrockなどでLAN内の `UDP/19132` を検証してから、PS5側の接続経路を切り分けます。
 
-詳細:
-
-[`docs/bedrock-crossplay.md`](docs/bedrock-crossplay.md)
+詳細: [`docs/bedrock-crossplay.md`](docs/bedrock-crossplay.md)
 
 ## Learning Roadmap
 
-1. Docker Compose で Paper Server を起動
-2. LAN 内のJava Editionから TCP/25565 へ接続
-3. world データの永続化を確認
-4. Geyser/FloodgateでBedrock接続を確認
-5. Backup / Restore を実装
-6. Health Check と障害切り分け
-7. Prometheus / Grafana などで Observability を追加
-8. GitHub Actions で構成検証
-9. Terraform / Ansible などで再構築可能にする
+1. `local-up.sh` でローカル起動
+2. Ubuntu上のJava Editionから `localhost:25565` へ接続
+3. LAN 内のJava Editionから TCP/25565 へ接続
+4. world データの永続化を確認
+5. Geyser/FloodgateでBedrock接続を確認
+6. Backup / Restore を実装
+7. Health Check と障害切り分け
+8. Prometheus / Grafana などで Observability を追加
+9. GitHub Actions で構成検証
+10. Terraform / Ansible などで再構築可能にする
 
 詳細は [`docs/learning-roadmap.md`](docs/learning-roadmap.md) を参照してください。
 
@@ -249,19 +249,3 @@ Prism Launcher
 ## EULA
 
 初回起動には Minecraft EULA への同意が必要です。本ラボでは Compose の `EULA=TRUE` により同意を明示します。利用前に Minecraft の EULA を確認してください。
-
-## First Run
-
-```bash
-git pull
-cp .env.example .env
-nano .env
-
-docker compose config
-docker compose pull
-docker compose up -d
-docker compose ps
-docker compose logs -f minecraft
-```
-
-まずは Paper + Geyser + Floodgate が正常に起動し、Ubuntu上のJava Clientから `localhost:25565` へ入れるところまでをPhase 1とします。
