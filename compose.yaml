@@ -16,7 +16,11 @@ services:
 
       # Paper is lighter than vanilla and can load Geyser/Floodgate plugins.
       TYPE: "PAPER"
-      VERSION: "LATEST"
+
+      # Do not use LATEST here. As of 2026-10-14, stable Geyser supports
+      # Minecraft Java 26.2, while Paper 26.3 requires an experimental Geyser
+      # preview build. Pinning keeps this lab on the supported path.
+      VERSION: "${MINECRAFT_VERSION:-26.2}"
 
       # Official GeyserMC downloads. Floodgate lets Xbox Live authenticated
       # Bedrock users join without owning a separate Java Edition account.
