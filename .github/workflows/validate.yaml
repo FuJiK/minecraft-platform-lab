@@ -23,3 +23,6 @@ jobs:
         run: |
           bash -n scripts/healthcheck.sh
           bash -n scripts/backup.sh
+          bash -n scripts/local-up.sh
+          bash -n scripts/local-status.sh
+          bash -n scripts/local-down.sh
